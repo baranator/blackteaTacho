@@ -1,3 +1,6 @@
+#ifndef TFT_H
+#define TFT_H
+
 #include <Arduino_GFX_Library.h>
 #include <SPI.h>
 #define TFT_CS 40 // GFX_NOT_DEFINED for display without CS pin
@@ -28,3 +31,5 @@ void tftBacklight(boolean on){
   pinMode(GFX_BL, OUTPUT);
   digitalWrite(GFX_BL, on?HIGH:LOW);  
 }
+
+#endif

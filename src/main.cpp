@@ -1,15 +1,15 @@
 #include "tft.h"
 #include "btmlogo.h"
+#include "btmui.h"
 
 #include "lvgl.h"
     
 #include "touch.h"
-#include "brandon_BI.c"
 
 
  
 
-LV_FONT_DECLARE(brandon_BI);
+
 
 uint32_t screenW;
 uint32_t screenH;
@@ -64,8 +64,8 @@ void setup(){
 
   tftBacklight(true);
   Serial.begin(115200);
-  // Serial.setDebugOutput(true);
-  // while(!Serial);
+  Serial.setDebugOutput(true);
+  while(!Serial);
   Serial.println("Arduino_GFX LVGL_Arduino_v9 example ");
   String LVGL_Arduino = String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
   Serial.println(LVGL_Arduino);
@@ -124,14 +124,7 @@ void setup(){
     // lv_label_set_text(label, "Hello Arduino, I'm LVGL!(V" GFX_STR(LVGL_VERSION_MAJOR) "." GFX_STR(LVGL_VERSION_MINOR) "." GFX_STR(LVGL_VERSION_PATCH) ")");
     // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
-     lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x000000), LV_PART_MAIN);
-lv_obj_t * label1 = lv_label_create(lv_screen_active());
- lv_label_set_text(label1,"78kmh");
- static lv_style_t my_style;
-lv_style_init(&my_style);
-lv_style_set_text_font(&my_style, &brandon_BI);
-lv_style_set_text_color(&my_style,lv_color_hex(0xffffff));
-lv_obj_add_style(label1, &my_style, 0);
+     showMainScreen();
   }
 
   Serial.println("Setup done");
