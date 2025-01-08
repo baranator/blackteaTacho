@@ -13,9 +13,17 @@
 
 uint32_t screenW;
 uint32_t screenH;
+unsigned long tl;
+
 uint32_t bufSize;
+
+
+
 lv_display_t *disp;
 lv_color_t *disp_draw_buf;
+
+
+
 
 #if LV_USE_LOG != 0
 void my_print(lv_log_level_t level, const char *buf)
@@ -61,7 +69,7 @@ void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data){
 }
 
 void setup(){
-
+  tl=millis();
   tftBacklight(true);
   Serial.begin(115200);
   Serial.setDebugOutput(true);
@@ -137,5 +145,11 @@ void loop(){
   gfx->flush();
 #endif
 
+  if(millis()-tl>2000){
+    setSpeed(random(4,135));
+    tl=millis();
+  }
   delay(5);
+
+
 }
