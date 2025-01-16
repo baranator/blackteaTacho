@@ -34,6 +34,7 @@ void my_print(lv_log_level_t level, const char *buf)
 }
 #endif
 
+
 uint32_t millis_cb(void){
   return millis();
 }
@@ -147,6 +148,7 @@ void loop(){
 
   if(millis()-tl>2000){
     setSpeed(random(4,135));
+    setPower(random(-100,100));
     tl=millis();
   }
   delay(5);
