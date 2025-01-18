@@ -116,6 +116,10 @@ void setup(){
     Serial.println("LVGL disp_draw_buf allocate failed!");
   }else{
     disp = lv_display_create(screenW, screenH);
+     
+
+
+
     lv_display_set_flush_cb(disp, my_disp_flush);
 
     lv_display_set_buffers(disp, disp_draw_buf, NULL, bufSize * 2, LV_DISPLAY_RENDER_MODE_PARTIAL);
@@ -126,14 +130,8 @@ void setup(){
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
     lv_indev_set_read_cb(indev, my_touchpad_read);
 
-    /* Option 1: Create a simple label
-     * ---------------------
-     */
-    // lv_obj_t *label = lv_label_create(lv_scr_act());
-    // lv_label_set_text(label, "Hello Arduino, I'm LVGL!(V" GFX_STR(LVGL_VERSION_MAJOR) "." GFX_STR(LVGL_VERSION_MINOR) "." GFX_STR(LVGL_VERSION_PATCH) ")");
-    // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
-     showMainScreen();
+     showMainScreen(disp);
   }
 
   Serial.println("Setup done");
@@ -146,7 +144,7 @@ void loop(){
   gfx->flush();
 #endif
 
-  if(millis()-tl>2000){
+  if(millis()-tl>500){
     setSpeed(random(4,135));
     setPower(random(-100,100));
     tl=millis();
