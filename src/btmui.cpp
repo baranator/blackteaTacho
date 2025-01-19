@@ -7,9 +7,12 @@
 
 LV_FONT_DECLARE(brandon_BI_40);
 LV_FONT_DECLARE(brandon_BI_50);
+LV_FONT_DECLARE(brandon_BI_55);
 LV_FONT_DECLARE(brandon_BI_150);
 LV_FONT_DECLARE(googleMat40);
 //LV_FONT_DECLARE(lv_font_montserrat_10);
+
+lv_theme_t * th;
 
 static lv_style_t t_speed_style;
     static lv_style_t t_unit_style;
@@ -26,12 +29,21 @@ lv_obj_t * statsTab;
 lv_obj_t * settingsTab;
 lv_obj_t * tabview;
 
+//warning lights
+lv_obj_t* warnEngine;
+lv_obj_t* warnLight;
+lv_obj_t* warnBattery;
+lv_obj_t* warnTemp;
+
 void setSpeed(uint8_t val){
       lv_arc_set_value(arc, val);
       char str[5];
       sprintf(str, "%d", val);
       lv_label_set_text(t_speed,str);
+}
 
+void setLight(bool on){
+  lv_obj_set_style_text_color(warnLight, lv_color_hex(on?0x0000ff:0x222222),LV_PART_MAIN);
 }
 
 void setPower(int16_t val){
@@ -46,12 +58,26 @@ void setPower(int16_t val){
    // lv_arc_align_obj_to_angle(pm_arc, pm_label, 25);
 }
 
+void  drawGearDisp(int x=0, int y=0, int rad=360){
 
+    //gear display
+    lv_obj_t * gearDisp = lv_label_create(tachoTab);
+    lv_obj_set_style_text_font(gearDisp, &brandon_BI_55,0);
+    lv_label_set_text(gearDisp, "2");
+    lv_obj_set_style_text_align(gearDisp,LV_TEXT_ALIGN_RIGHT,LV_PART_MAIN);
+    lv_obj_align(gearDisp, LV_ALIGN_BOTTOM_LEFT, x+209, y-78);
+    lv_obj_set_style_bg_opa(gearDisp, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(gearDisp,lv_color_hex(0xffffff),LV_PART_MAIN);//lv_theme_get_color_primary(gearDisp),LV_PART_MAIN);
+    lv_obj_set_style_text_color(gearDisp,lv_color_hex(0x000000),LV_PART_MAIN);
+    lv_obj_set_style_size(gearDisp,69, 55, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(gearDisp, 4,LV_PART_MAIN); 
+    lv_obj_set_style_pad_right(gearDisp, 7,LV_PART_MAIN); 
+}
 
 void drawPowerMeter(int x=0, int y=0, int rad=360){
      /*Create an Arc*/
     pm_arc = lv_arc_create(tachoTab);
-    lv_obj_set_size(pm_arc, rad-80, rad-80);
+    lv_obj_set_size(pm_arc, rad-78, rad-78);
     lv_arc_set_rotation(pm_arc, 135);
     lv_arc_set_range(pm_arc, -100, 100);
     lv_arc_set_bg_angles(pm_arc, 0, 90);
@@ -117,16 +143,13 @@ void drawTacho(int x=0, int y=0, int rad=360){
     lv_obj_add_style(arc, &bg_style, LV_PART_MAIN);
 
     //remove knob
-    static lv_style_t my_style;
-    //lv_style_set_bg_opa (&my_style,0);
     lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
-    lv_obj_add_style(arc, &my_style, LV_PART_KNOB);
 
     //indicator
     static lv_style_t ind_style;
     lv_style_set_pad_bottom(&ind_style,0);
     lv_style_set_pad_top(&ind_style,0);
-    lv_style_set_arc_color(&ind_style,lv_color_hex(0xffffff));
+    lv_style_set_arc_color(&ind_style,lv_theme_get_color_primary(arc));
     lv_style_set_arc_width(&ind_style,40);
     lv_style_set_arc_rounded(&ind_style,false);
     lv_obj_add_style(arc, &ind_style, LV_PART_INDICATOR);
@@ -137,7 +160,7 @@ void drawTacho(int x=0, int y=0, int rad=360){
     //text in tacho - speed & unit
     t_speed = lv_label_create(tachoTab);
     
-    lv_obj_align(t_speed, LV_ALIGN_CENTER, 0+x, 0+y);
+    lv_obj_align(t_speed, LV_ALIGN_CENTER, 0+x, y-10);
     
     lv_style_init(&t_speed_style);
     lv_style_set_text_font(&t_speed_style, &brandon_BI_150);
@@ -147,7 +170,7 @@ void drawTacho(int x=0, int y=0, int rad=360){
 
     t_unit = lv_label_create(tachoTab);
     
-    lv_obj_align(t_unit, LV_ALIGN_CENTER, 0+x, 75+y);
+    lv_obj_align(t_unit, LV_ALIGN_CENTER, 0+x, y+62);
     lv_style_init(&t_unit_style);
     lv_style_set_text_font(&t_unit_style, &brandon_BI_40);
     lv_style_set_text_color(&t_unit_style,lv_color_hex(0x999999));
@@ -197,69 +220,17 @@ void drawTachoV2(int x=0, int y=0, int rad=360){
     lv_style_set_line_width(&minor_ticks_style, 2U);    /*Tick width*/
     lv_obj_add_style(scale, &minor_ticks_style, LV_PART_ITEMS);
 
-    static lv_style_t main_line_style;
-    lv_style_init(&main_line_style);
     /* Main line properties */
    // lv_style_set_arc_color(&main_line_style, lv_palette_darken(LV_PALETTE_BLUE, 3));
-    lv_style_set_arc_width(&main_line_style, 0); /*Tick width*/
-    lv_obj_add_style(scale, &main_line_style, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(scale, 0, LV_PART_MAIN); /*Tick width*/
+    //lv_obj_add_style(scale, &main_line_style, );
 
 
-/*
-    // Add a section 
-    // static lv_style_t section_minor_tick_style;
-    static lv_style_t section_label_style;
-    static lv_style_t section_main_line_style;
-
-    lv_style_init(&section_label_style);
-    lv_style_init(&section_minor_tick_style);
-    lv_style_init(&section_main_line_style);
-
-    //Label style properties 
-    lv_style_set_text_font(&section_label_style, LV_FONT_DEFAULT);
-    lv_style_set_text_color(&section_label_style, lv_palette_darken(LV_PALETTE_RED, 3));
-
-    lv_style_set_line_color(&section_label_style, lv_palette_darken(LV_PALETTE_RED, 3));
-    lv_style_set_line_width(&section_label_style, 5U); //Tick width
-
-    lv_style_set_line_color(&section_minor_tick_style, lv_palette_lighten(LV_PALETTE_RED, 2));
-    lv_style_set_line_width(&section_minor_tick_style, 4U); //Tick width
-
-    // Main line properties
-    lv_style_set_arc_color(&section_main_line_style, lv_palette_darken(LV_PALETTE_RED, 3));
-    lv_style_set_arc_width(&section_main_line_style, 4U); //Tick width
-    */
-    
-
-    /* Configure section styles */
-   /* lv_scale_section_t * section = lv_scale_add_section(scale);
-    lv_scale_section_set_range(section, 75, 100);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);*/
 
 }
 
-void drawSingleTile(const char* heading, uint8_t x, uint8_t y){
-  lv_obj_t * tile1 = lv_tileview_add_tile(tachoTileView, x, y, LV_DIR_VER);
-  lv_obj_set_size(tile1, 120, 100);
-  lv_obj_t * label = lv_label_create(tile1);
-  lv_label_set_text(label, heading);
-  lv_obj_set_size(label, 120, 100);
-  
-  //lv_obj_center(label);
 
-}
 
-void drawTachoTiles(){
-  tachoTileView = lv_list_create(tachoTab);
-    lv_obj_set_style_bg_color(tachoTileView, lv_color_hex(0x222222), LV_PART_MAIN);
-
-  lv_obj_align(tachoTileView, LV_ALIGN_TOP_RIGHT, 0, 0);
-  lv_obj_set_size(tachoTileView, 250, 440);
-  drawSingleTile("hihi",0,0);
-  drawSingleTile("hoho",0,1);
-}
 
 #define CANVAS_WIDTH  50
 #define CANVAS_HEIGHT  50
@@ -349,18 +320,17 @@ void drawTabView(void){
 
     /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
     tachoTab = lv_tabview_add_tab(tabview, "TachoTab");
-    settingsTab = lv_tabview_add_tab(tabview, "SettingsTab");
     statsTab = lv_tabview_add_tab(tabview, "StatsTab");
-
-    lv_obj_set_style_bg_color(settingsTab, lv_palette_lighten(LV_PALETTE_AMBER, 3), 0);
-    lv_obj_set_style_bg_opa(settingsTab, LV_OPA_COVER, 0);
+    settingsTab = lv_tabview_add_tab(tabview, "SettingsTab");
+   // lv_obj_set_style_bg_color(settingsTab, lv_palette_lighten(LV_PALETTE_AMBER, 3), 0);
+    //v_obj_set_style_bg_opa(settingsTab, LV_OPA_COVER, 0);
 
     /*Add content to the tabs*/
     lv_obj_t * label;// = lv_label_create(tachoTab);
    // lv_label_set_text(label, "First tab");
 
-    label = lv_label_create(settingsTab);
-    lv_label_set_text(label, "Second tab");
+    //label = lv_label_create(settingsTab);
+   //lv_label_set_text(label, "Second tab");
 
     label = lv_label_create(statsTab);
     lv_label_set_text(label, "Third tab");
@@ -398,12 +368,11 @@ lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_
 
 
 
-    lv_obj_t *  cont = lv_obj_create(parent);
-    
+    lv_obj_t * cont = lv_obj_create(parent);
+    lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
     lv_obj_t * label = lv_label_create(cont);
     lv_obj_set_style_pad_all(label,2,0);
-    lv_obj_t * value = lv_label_create(cont);
-    lv_obj_set_style_pad_all(value,2,0);
+    
     lv_label_set_text(label, name);
 
     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
@@ -416,15 +385,14 @@ lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_
     //lv_obj_add_style(cont, &tileStyle, 0);
 
     //lv_obj_set_size(cont, 200, 120);
-    lv_obj_align(cont , LV_ALIGN_TOP_RIGHT, 0, 0);
+    //lv_obj_align(cont, LV_ALIGN_CENTER, 0, 0);
     //lv_obj_center(cont);
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
     // lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
-    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    
 
-    lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_STRETCH, col, 1,
-                             LV_GRID_ALIGN_STRETCH, row, 1);
+    lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
 
     return cont;
 }
@@ -443,7 +411,7 @@ void drawInfoGrid(){
     lv_style_set_pad_row(&gridStyle,1);
     lv_style_set_pad_all(&gridStyle,1);
     lv_style_set_radius(&gridStyle,0);
-     lv_obj_add_style(cont, &gridStyle, 0);
+    lv_obj_add_style(cont, &gridStyle, 0);
 
     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
     lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
@@ -453,62 +421,118 @@ void drawInfoGrid(){
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
      lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
 
-    lv_obj_t * label;
     lv_obj_t * obj;
-    lv_style_t btnstyle;
-    lv_style_init(&btnstyle);
-    lv_style_set_bg_color(&btnstyle,lv_color_hex(0x000000));
+  lv_obj_t * value;
 
+    
+    
+    obj = drawInfoTile(cont, "Restreichweite",0,0);
+    value = lv_label_create(obj);
+    lv_label_set_text(value, "42km");
+    lv_obj_set_style_pad_all(value,2,0);
+    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    
 
-    obj = drawInfoTile(cont, "Reichweite",0,0);
     obj = drawInfoTile(cont, "Akkustand",1,0);
-    obj = drawInfoTile(cont, "Gesamtkilometer",2,0);
+    value = lv_label_create(obj);
+    lv_label_set_text(value, "69"); 
+    //lv_obj_set_style_pad_all(value,2,0);
+    lv_obj_set_style_text_font(value, &brandon_BI_50,0);
+    //lv_obj_set_style_text_align(value, LV_TEXT_ALIGN_CENTER, 0);
+    
+    //lv_obj_set_size(value, 50, 50);
+    //lv_obj_center(value);
+    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
+   
 
+    obj = drawInfoTile(cont, "Gesamtkilometer",2,0);  
+    value = lv_label_create(obj);
+    lv_label_set_text(value, "1337km");
+    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
 
-
-    for(uint32_t i = 0; i < 3; i++) {
-        uint8_t col = i % 1;
-        uint8_t row = i / 1;
-
-       // obj = drawInfoTile(cont, "akku",row,col);
-        //lv_obj_add_style(obj,&btnstyle,0);
-        /*Stretch the cell horizontally and vertically too
-         *Set span to 1 to make the cell 1 column/row sized*/
-        
-
-        //label = lv_label_create(obj);
-        //lv_obj_add_style(label,&btnstyle,0);
-        //lv_label_set_text_fmt(label, "c%d, r%d", col, row);
-        //lv_obj_center(label);
-    }
 
 
 }
 
+lv_obj_t * initWarnLight(  lv_obj_t * parent, const char* symbol,int32_t posx, int32_t posy){
+  lv_obj_t * lbl= lv_label_create(parent);
+  lv_label_set_text(lbl, symbol);
+
+  static lv_style_t warnStyle;
+  lv_style_init(&warnStyle);
+  lv_style_set_bg_opa(&warnStyle, LV_OPA_0);
+  lv_style_set_pad_all(&warnStyle, 2);
+  lv_style_set_text_font(&warnStyle, &lv_font_montserrat_40);
+  lv_style_set_text_color(&warnStyle, lv_color_hex(0x222222));
+  lv_obj_add_style(lbl, &warnStyle, LV_PART_MAIN);
+  
+
+  lv_obj_set_grid_cell(lbl, LV_GRID_ALIGN_STRETCH, posx, 1, LV_GRID_ALIGN_STRETCH, posy, 1);
+  return lbl;
+}
+
+void drawWarningLights(){
+    static int32_t col_dsc[] = {50,50,50,50, LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {50, LV_GRID_TEMPLATE_LAST};
+
+
+
+     /*Create a container with grid*/
+    lv_obj_t * cont = lv_obj_create(tachoTab);
+
+    lv_obj_set_style_bg_opa(cont, LV_OPA_0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(cont, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(cont, 0, LV_PART_MAIN);
+    lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
+    lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
+    lv_obj_set_size(cont, 240, 70);
+    //lv_obj_center(cont);
+    lv_obj_set_layout(cont, LV_LAYOUT_GRID);
+    lv_obj_align(cont , LV_ALIGN_BOTTOM_LEFT, 180, -60);
+
+
+
+    warnEngine = initWarnLight(cont,LV_SYMBOL_WARNING,3,0);
+    warnLight= initWarnLight(cont,LV_SYMBOL_EYE_OPEN,0,0);
+    warnBattery = initWarnLight(cont,LV_SYMBOL_BATTERY_1,1,0);
+    warnTemp = initWarnLight(cont,LV_SYMBOL_UP,2,0);
+
+}
+
+
+
 void createTachoTab(){
-   
-   drawTacho(-130,0,360);
-   drawTachoV2(-130,0,360);
+   //fahrstufe???, blinker
+   drawPowerMeter(-110,0,400);
+   drawGearDisp(-110,0,400);
+   drawTacho(-110,0,400);
+   drawTachoV2(-110,0,400);
+   //kontrolleuchten: FernLicht, Temperaturwarnung heiß/kalt, Akku/Reserve/wird geladen, Motor/Technikproblem
    //drawTachoTiles();
-   drawPowerMeter(-130,0,360);
+   
+   
    drawInfoGrid();
+   drawWarningLights();
 }
 
 void createSettingsTab(){
-
+  lv_obj_t *  heading = lv_label_create(settingsTab);
+  lv_obj_align(heading , LV_ALIGN_TOP_LEFT, 10, 10);
+  lv_label_set_text(heading, "Einstellungen");
+  lv_obj_set_style_text_font(heading, &lv_font_montserrat_18,0);
 
 }
 
 void drawClock(){
   lv_obj_t *  clk = lv_label_create(lv_screen_active());
-  lv_obj_align(clk , LV_ALIGN_TOP_RIGHT, -10, 10);
+  lv_obj_align(clk , LV_ALIGN_TOP_RIGHT, -20, 10);
   lv_obj_set_style_text_font(clk, &brandon_BI_40,0);
-  lv_label_set_text(clk,"hh/mm");
+  lv_label_set_text(clk,"13.37");
 
 }
 
 void showMainScreen(lv_display_t * display){
- lv_theme_t * th = lv_theme_default_init(display,                 /* Use DPI, size, etc. from this display */
+ th = lv_theme_default_init(display,                 /* Use DPI, size, etc. from this display */
                                         lv_color_hex(0xffffff),   /* Primary and secondary palette */
                                         lv_color_hex(0xdddddd),
                                         true,                   /* Dark theme?  False = light theme. */
@@ -519,6 +543,7 @@ void showMainScreen(lv_display_t * display){
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x000000), LV_PART_MAIN);
   drawTabView();
   createTachoTab();
+  createSettingsTab();
   drawClock();
 
    // drawTempBars(0,0);

@@ -103,7 +103,7 @@ void setup(){
   screenW = gfx->width();
   screenH = gfx->height();
 
-  bufSize = screenW * 40;
+  bufSize = screenW * screenH / 10;
 
 
   disp_draw_buf = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
@@ -117,7 +117,7 @@ void setup(){
   }else{
     disp = lv_display_create(screenW, screenH);
      
-
+   
 
 
     lv_display_set_flush_cb(disp, my_disp_flush);
@@ -131,7 +131,7 @@ void setup(){
     lv_indev_set_read_cb(indev, my_touchpad_read);
 
 
-     showMainScreen(disp);
+    showMainScreen(disp);
   }
 
   Serial.println("Setup done");
@@ -145,11 +145,12 @@ void loop(){
 #endif
 
   if(millis()-tl>500){
-    setSpeed(random(4,135));
-    setPower(random(-100,100));
+    setSpeed(random(30,110));
+    setPower(random(-90,90));
+    setLight(random(0,100)>70);
     tl=millis();
   }
-  delay(5);
+  delay(1);
 
 
 }
