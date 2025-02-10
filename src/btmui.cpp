@@ -1,6 +1,8 @@
+#include <stdio.h>
+#include <string.h>
+
 #include "lvgl.h"
 #include "btmui.h"
-#include "SerialDebug.h"
 #include "../.pio/libdeps/esp32-s3/lvgl/examples/lv_examples.h"
 
 
@@ -17,7 +19,7 @@ lv_theme_t * th;
 static lv_style_t t_speed_style;
     static lv_style_t t_unit_style;
 static lv_style_t pm_bg_style;
-static lv_style_t pm_ind_style;
+//static lv_style_t pm_ind_style;
 
 lv_obj_t *arc, *pm_arc;
 lv_obj_t * t_unit ;
@@ -47,13 +49,14 @@ void setLight(bool on){
 }
 
 void setPower(int16_t val){
-      lv_arc_set_value(pm_arc, val);
-          if(val<0){
-      lv_style_set_arc_color(&pm_ind_style,lv_color_hex(0x00ff00));
-    }else{
-      lv_style_set_arc_color(&pm_ind_style,lv_color_hex(0xff0000));
-    }
-    lv_obj_add_style(pm_arc, &pm_ind_style, LV_PART_INDICATOR);
+  
+  if(val<0){
+      lv_obj_set_style_arc_color(pm_arc,lv_color_hex(0x00ff00),LV_PART_INDICATOR);
+  }else{
+      lv_obj_set_style_arc_color(pm_arc,lv_color_hex(0xff0000),LV_PART_INDICATOR);
+  }
+  lv_arc_set_value(pm_arc, val);
+  //lv_obj_add_style(pm_arc, &pm_ind_style, LV_PART_INDICATOR);
     //lv_label_set_text(pm_label,"x");
    // lv_arc_align_obj_to_angle(pm_arc, pm_label, 25);
 }
@@ -104,13 +107,13 @@ void drawPowerMeter(int x=0, int y=0, int rad=360){
 
     //indicator
     
-    lv_style_set_pad_bottom(&pm_ind_style,0);
-    lv_style_set_pad_top(&pm_ind_style,0);
-    lv_style_set_arc_color(&pm_ind_style,lv_color_hex(0xff0000));
-    lv_style_set_arc_width(&pm_ind_style,20);
-    lv_style_set_arc_rounded(&pm_ind_style,false);
+    lv_obj_set_style_pad_bottom(pm_arc, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_pad_top(pm_arc, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(pm_arc, lv_color_hex(0xff0000), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(pm_arc, 20, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_rounded(pm_arc, false, LV_PART_INDICATOR);
     
-    lv_obj_add_style(pm_arc, &pm_ind_style, LV_PART_INDICATOR);
+    //lv_obj_add_style(pm_arc, &pm_ind_style, LV_PART_INDICATOR);
 
     //readonly
     lv_obj_remove_flag(pm_arc, LV_OBJ_FLAG_CLICKABLE);

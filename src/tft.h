@@ -8,7 +8,7 @@
 #define TFT_RST 42
 #define GFX_BL 2
 
-#define DTFT_MOSI 35
+#define TFT_MOSI 35
 #define TFT_SCLK 36
  
 
@@ -23,7 +23,7 @@ Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     8 /* B0 */, 3 /* B1 */, 46 /* B2 */, 9 /* B3 */, 1 /* B4 */,
     0 /* hsync_polarity */, 8 /* hsync_front_porch */, 4 /* hsync_pulse_width */, 8 /* hsync_back_porch */,
     0 /* vsync_polarity */, 8 /* vsync_front_porch */, 4 /* vsync_pulse_width */, 8 /* vsync_back_porch */,
-    1 /* pclk_active_neg */, 16000000 /* prefer_speed */);
+    1 /* pclk_active_neg */, 14000000L /* prefer_speed */); //at least 14.000.000
 Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
     800 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */);
 
