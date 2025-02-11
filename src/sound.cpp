@@ -13,7 +13,7 @@ unsigned int rate=100;
 uint8_t volume_perc=70;
 int8_t fac=1;
 
-const uint16_t PLAY_BUF_SIZE=50; //should be a multiple of 100
+const uint16_t PLAY_BUF_SIZE=100; //should be a multiple of 100
 
 unsigned char play_buffer[PLAY_BUF_SIZE]; 
 
