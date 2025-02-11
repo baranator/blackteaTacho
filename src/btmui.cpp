@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "sound.h"
 #include "lvgl.h"
 #include "btmui.h"
 #include "../.pio/libdeps/esp32-s3/lvgl/examples/lv_examples.h"
@@ -19,6 +20,7 @@ lv_theme_t * th;
 static lv_style_t t_speed_style;
     static lv_style_t t_unit_style;
 static lv_style_t pm_bg_style;
+static lv_style_t tileGridStyle;
 //static lv_style_t pm_ind_style;
 
 lv_obj_t *arc, *pm_arc;
@@ -271,40 +273,40 @@ void lv_example_canvas_5(void){
 
 }
 
-void drawTempBars(int x=0,int y=0){
-  static lv_style_t style_indic;
-  static lv_style_t style_bg;
-    lv_style_init(&style_indic);
-    lv_style_set_bg_opa(&style_indic, LV_OPA_COVER);
-    lv_style_set_bg_color(&style_indic, lv_color_hex(0xffffff));
-    lv_style_set_radius(&style_indic,0);
+// void drawTempBars(int x=0,int y=0){
+//   static lv_style_t style_indic;
+//   static lv_style_t style_bg;
+//     lv_style_init(&style_indic);
+//     lv_style_set_bg_opa(&style_indic, LV_OPA_COVER);
+//     lv_style_set_bg_color(&style_indic, lv_color_hex(0xffffff));
+//     lv_style_set_radius(&style_indic,0);
     
-    lv_style_init(&style_bg);
-    lv_style_set_border_side(&style_bg, LV_BORDER_SIDE_TOP);
-    lv_style_set_border_color(&style_bg, lv_color_hex(0xff0000));
-    lv_style_set_border_width(&style_bg, 2);
-    lv_style_set_pad_all(&style_bg, 0); /*To make the indicator smaller*/
-    lv_style_set_radius(&style_bg, 0);
+//     lv_style_init(&style_bg);
+//     lv_style_set_border_side(&style_bg, LV_BORDER_SIDE_TOP);
+//     lv_style_set_border_color(&style_bg, lv_color_hex(0xff0000));
+//     lv_style_set_border_width(&style_bg, 2);
+//     lv_style_set_pad_all(&style_bg, 0); /*To make the indicator smaller*/
+//     lv_style_set_radius(&style_bg, 0);
     
-    
-
-
-    bar_temp_motor = lv_bar_create(lv_screen_active());
-
     
 
-    lv_obj_remove_style_all(bar_temp_motor);  /*To have a clean start*/
-    lv_obj_add_style(bar_temp_motor, &style_bg, 0);
-    lv_obj_add_style(bar_temp_motor, &style_indic, LV_PART_INDICATOR);
+
+//     bar_temp_motor = lv_bar_create(lv_screen_active());
+
+    
+
+//     lv_obj_remove_style_all(bar_temp_motor);  /*To have a clean start*/
+//     lv_obj_add_style(bar_temp_motor, &style_bg, 0);
+//     lv_obj_add_style(bar_temp_motor, &style_indic, LV_PART_INDICATOR);
   
-  //lv_obj_center(bar_temp_motor)
-    lv_bar_set_orientation(bar_temp_motor, LV_BAR_ORIENTATION_VERTICAL);
-    lv_obj_align(bar_temp_motor, LV_ALIGN_BOTTOM_LEFT, 10+x, y-30);
-    lv_bar_set_range(bar_temp_motor, 0, 100);
-    lv_obj_set_size(bar_temp_motor, 20, 200);
-    lv_bar_set_value(bar_temp_motor, 21, LV_ANIM_OFF);
+//   //lv_obj_center(bar_temp_motor)
+//     lv_bar_set_orientation(bar_temp_motor, LV_BAR_ORIENTATION_VERTICAL);
+//     lv_obj_align(bar_temp_motor, LV_ALIGN_BOTTOM_LEFT, 10+x, y-30);
+//     lv_bar_set_range(bar_temp_motor, 0, 100);
+//     lv_obj_set_size(bar_temp_motor, 20, 200);
+//     lv_bar_set_value(bar_temp_motor, 21, LV_ANIM_OFF);
 
-}
+// }
 
 void drawTabView(void){
     /*Create a Tab view object*/
@@ -363,9 +365,9 @@ void drawTabView(void){
     lv_obj_remove_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLLABLE);
 }
 
-lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_t col){
-    static int32_t col_dsc[] = {200, LV_GRID_TEMPLATE_LAST};
-    static int32_t row_dsc[] = {16, 90, LV_GRID_TEMPLATE_LAST};
+lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_t col, uint16_t xsize=190,uint16_t ysize=100){
+    static int32_t col_dsc[] = {xsize, LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {16, ysize-16, LV_GRID_TEMPLATE_LAST};
     //static lv_style_t tileStyle;
 
 
@@ -374,14 +376,15 @@ lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
     lv_obj_t * label = lv_label_create(cont);
-    lv_obj_set_style_pad_all(label,2,0);
+    lv_obj_set_style_pad_all(label,5,0);
     
     lv_label_set_text(label, name);
 
     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
     lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
     lv_obj_set_style_pad_all(cont,0,0);
-    lv_obj_set_style_border_width(cont,0,0);
+    lv_obj_set_style_border_width(cont,2,0);
+    lv_obj_set_style_border_color(cont,lv_color_hex(0xffffff),0);
     //lv_obj_set_style_pad_hor(cont,0,0);
 
     lv_obj_set_style_radius(cont,0,0);
@@ -403,18 +406,14 @@ lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_
 void drawInfoGrid(){
     static int32_t col_dsc[] = {200, LV_GRID_TEMPLATE_LAST};
     static int32_t row_dsc[] = {120, 120, 120, LV_GRID_TEMPLATE_LAST};
-    static lv_style_t gridStyle;
-    lv_style_init(&gridStyle);
+  
+    
 
      /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(tachoTab);
-    lv_obj_set_style_bg_color(cont, lv_color_hex(0x222222), LV_PART_MAIN);
-    lv_style_set_pad_column(&gridStyle,1);
-    lv_style_set_border_width(&gridStyle,0);
-    lv_style_set_pad_row(&gridStyle,1);
-    lv_style_set_pad_all(&gridStyle,1);
-    lv_style_set_radius(&gridStyle,0);
-    lv_obj_add_style(cont, &gridStyle, 0);
+    lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), LV_PART_MAIN);
+
+    lv_obj_add_style(cont, &tileGridStyle, 0);
 
     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
     lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
@@ -422,7 +421,7 @@ void drawInfoGrid(){
     lv_obj_align(cont , LV_ALIGN_TOP_RIGHT, 0, 40);
     //lv_obj_center(cont);
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-     lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
+    lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
 
     lv_obj_t * obj;
   lv_obj_t * value;
@@ -433,25 +432,22 @@ void drawInfoGrid(){
     value = lv_label_create(obj);
     lv_label_set_text(value, "42km");
     lv_obj_set_style_pad_all(value,2,0);
-    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    lv_obj_set_style_text_font(value, &brandon_BI_50,0);
+    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
     
 
     obj = drawInfoTile(cont, "Akkustand",1,0);
     value = lv_label_create(obj);
-    lv_label_set_text(value, "69"); 
-    //lv_obj_set_style_pad_all(value,2,0);
+    lv_label_set_text(value, "69p"); 
     lv_obj_set_style_text_font(value, &brandon_BI_50,0);
-    //lv_obj_set_style_text_align(value, LV_TEXT_ALIGN_CENTER, 0);
-    
-    //lv_obj_set_size(value, 50, 50);
-    //lv_obj_center(value);
     lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
    
 
     obj = drawInfoTile(cont, "Gesamtkilometer",2,0);  
     value = lv_label_create(obj);
     lv_label_set_text(value, "1337km");
-    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    lv_obj_set_style_text_font(value, &brandon_BI_50,0);
+    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
 
 
 
@@ -491,7 +487,7 @@ void drawWarningLights(){
     lv_obj_set_size(cont, 240, 70);
     //lv_obj_center(cont);
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-    lv_obj_align(cont , LV_ALIGN_BOTTOM_LEFT, 180, -60);
+    lv_obj_align(cont , LV_ALIGN_BOTTOM_LEFT, 185, -60);
 
 
 
@@ -518,11 +514,56 @@ void createTachoTab(){
    drawWarningLights();
 }
 
+static void sw_avas_evh(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_current_target_obj(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
+        LV_UNUSED(obj);
+        LV_LOG_USER("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
+        if(lv_obj_has_state(obj, LV_STATE_CHECKED)){
+          soundEnable();
+        }else{
+          soundDisable();
+        }
+    }
+}
+
+
 void createSettingsTab(){
   lv_obj_t *  heading = lv_label_create(settingsTab);
   lv_obj_align(heading , LV_ALIGN_TOP_LEFT, 10, 10);
   lv_label_set_text(heading, "Einstellungen");
   lv_obj_set_style_text_font(heading, &lv_font_montserrat_18,0);
+
+  //Tiles for settings
+  static int32_t col_dsc[] = {360,360, LV_GRID_TEMPLATE_LAST};
+  static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST};
+  static lv_style_t gridStyle;
+  lv_style_init(&gridStyle);
+
+   /*Create a container with grid*/
+  lv_obj_t * cont = lv_obj_create(settingsTab);
+  lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
+  lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
+
+  lv_obj_set_size(cont, 750, 360);
+  lv_obj_align(cont , LV_ALIGN_TOP_LEFT, 0, 50);
+  //lv_obj_center(cont);
+  lv_obj_set_layout(cont, LV_LAYOUT_GRID);
+  lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
+  lv_obj_add_style(cont, &tileGridStyle, 0);
+
+  //AVAS ON/OFF
+  lv_obj_t *obj = drawInfoTile(cont, "AVAS",0,0,300,80);
+  lv_obj_t *value = lv_switch_create(obj);
+  //lv_obj_set_style_pad_all(value,2,0);
+  //lv_obj_set_style_text_font(value, &brandon_BI_50,0);
+  lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 1);
+  lv_obj_add_event_cb(value, sw_avas_evh, LV_EVENT_ALL, NULL);
+  
+
+
 
 }
 
@@ -531,6 +572,17 @@ void drawClock(){
   lv_obj_align(clk , LV_ALIGN_TOP_RIGHT, -20, 10);
   lv_obj_set_style_text_font(clk, &brandon_BI_40,0);
   lv_label_set_text(clk,"13.37");
+
+}
+
+void initTileGridStyle(){
+  lv_style_init(&tileGridStyle);
+  lv_style_set_pad_column(&tileGridStyle,1);
+  lv_style_set_border_width(&tileGridStyle,0);
+  lv_style_set_pad_row(&tileGridStyle,1);
+  lv_style_set_pad_all(&tileGridStyle,1);
+  lv_style_set_radius(&tileGridStyle,0);
+  lv_style_set_bg_color(&tileGridStyle, lv_color_hex(0x000000));
 
 }
 
@@ -544,6 +596,12 @@ void showMainScreen(lv_display_t * display){
 
 
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x000000), LV_PART_MAIN);
+
+
+  initTileGridStyle();
+
+
+
   drawTabView();
   createTachoTab();
   createSettingsTab();

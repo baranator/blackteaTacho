@@ -1,6 +1,7 @@
 #include "tft.h"
 #include "btmlogo.h"
 #include "btmui.h"
+#include "sound.h"
 
 #include "lvgl.h"
     
@@ -21,6 +22,7 @@ uint32_t bufSize;
 
 lv_display_t *disp;
 lv_color_t *disp_draw_buf;
+lv_color_t *disp_draw_buf2;
 
 
 
@@ -73,16 +75,16 @@ void setup(){
   tl=millis();
   tftBacklight(true);
   Serial.begin(115200);
-  Serial.setDebugOutput(true);
-  while(!Serial);
-  Serial.println("Arduino_GFX LVGL_Arduino_v9 example ");
+  //Serial.setDebugOutput(true);
+  //while(!Serial);
+  //Serial.println("Arduino_GFX LVGL_Arduino_v9 example ");
   String LVGL_Arduino = String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
-  Serial.println(LVGL_Arduino);
+  //Serial.println(LVGL_Arduino);
 
   // Init Display
   if (!gfx->begin())
   {
-    Serial.println("gfx->begin() failed!");
+    //Serial.println("gfx->begin() failed!");
   }
   gfx->fillScreen(RGB565_BLACK);
 
@@ -103,17 +105,23 @@ void setup(){
   screenW = gfx->width();
   screenH = gfx->height();
 
-  bufSize = screenW * screenH / 10;
+  bufSize = screenW * screenH / 4;
 
 
   disp_draw_buf = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+  disp_draw_buf2 = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
   if (!disp_draw_buf){
     // remove MALLOC_CAP_INTERNAL flag try again
     disp_draw_buf = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_8BIT);
   }
+  if (!disp_draw_buf2){
+    // remove MALLOC_CAP_INTERNAL flag try again
+    disp_draw_buf2 = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_8BIT);
+  }
+  
 
-  if (!disp_draw_buf){
-    Serial.println("LVGL disp_draw_buf allocate failed!");
+  if (!disp_draw_buf || !disp_draw_buf2){
+    //Serial.println("LVGL disp_draw_buf allocate failed!");
   }else{
     disp = lv_display_create(screenW, screenH);
      
@@ -124,7 +132,6 @@ void setup(){
 
     lv_display_set_buffers(disp, disp_draw_buf, NULL, bufSize * 2, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
-
     /*Initialize the (dummy) input device driver*/
     lv_indev_t *indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
@@ -133,24 +140,29 @@ void setup(){
 
     showMainScreen(disp);
   }
-
-  Serial.println("Setup done");
+  soundSetup();
+  //Serial.println("Setup done");
 }
+
 
 void loop(){
   lv_task_handler(); /* let the GUI do its work */
-
+  //soundLoop();
 #ifdef CANVAS
   gfx->flush();
 #endif
 
-  if(millis()-tl>500){
+  if(true && millis()-tl>500){
     setSpeed(random(30,110));
+    //soundLoop();
     setPower(random(-90,90));
+    //soundLoop();
     setLight(random(0,100)>70);
+    //soundLoop();
     tl=millis();
   }
-  delay(1);
+  //soundLoop();
+  delay(5);
 
 
 }
