@@ -4,6 +4,7 @@
 #include "sound.h"
 #include "lvgl.h"
 #include "btmui.h"
+#include "prefs.h"
 #include "../.pio/libdeps/esp32-s3/lvgl/examples/lv_examples.h"
 
 
@@ -522,8 +523,10 @@ static void sw_avas_evh(lv_event_t * e)
         LV_UNUSED(obj);
         LV_LOG_USER("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
         if(lv_obj_has_state(obj, LV_STATE_CHECKED)){
+          getPrefs()->putBool("avasEnabled", true);
           soundEnable();
         }else{
+          getPrefs()->putBool("avasEnabled", false);
           soundDisable();
         }
     }
@@ -557,6 +560,13 @@ void createSettingsTab(){
   //AVAS ON/OFF
   lv_obj_t *obj = drawInfoTile(cont, "AVAS",0,0,300,80);
   lv_obj_t *value = lv_switch_create(obj);
+  if(getPrefs()->getBool("avasEnabled")){
+    lv_obj_add_state(value, LV_STATE_CHECKED);
+    soundEnable();
+  }else{
+    lv_obj_remove_state(value, LV_STATE_CHECKED);
+    soundDisable();
+  }
   //lv_obj_set_style_pad_all(value,2,0);
   //lv_obj_set_style_text_font(value, &brandon_BI_50,0);
   lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 1);

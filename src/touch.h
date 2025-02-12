@@ -16,6 +16,9 @@
 // #define TOUCH_MAP_Y1 0
 // #define TOUCH_MAP_Y2 320
 
+
+// BE AWARE OF WIRE BUFFER NEEDS TO BE INCREASED TO AT LEAST 185!
+
 /* uncomment for GT911 */
  #define TOUCH_GT911
  #define TOUCH_GT911_SCL 20

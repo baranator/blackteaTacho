@@ -1,3 +1,8 @@
+
+
+
+
+
 #include "tft.h"
 #include "btmlogo.h"
 #include "btmui.h"
@@ -6,7 +11,7 @@
 #include "lvgl.h"
     
 #include "touch.h"
-
+#include "prefs.h"
 
  
 
@@ -71,8 +76,14 @@ void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data){
   }
 }
 
+
+
+
+
 void setup(){
   tl=millis();
+  initPrefs();
+
   tftBacklight(true);
   Serial.begin(115200);
   //Serial.setDebugOutput(true);

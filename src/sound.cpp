@@ -94,6 +94,7 @@ void soundSetup(){
 
 }
 void soundEnable(){
+
   sound_on=true;
 }
 void soundDisable(){
