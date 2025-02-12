@@ -404,6 +404,53 @@ lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_
     return cont;
 }
 
+struct infotile{
+  lv_obj_t * cont;
+  lv_obj_t * tile;
+  lv_obj_t * value;
+};
+
+void drawInfoTile2(lv_obj_t * parent,infotile* it, const char* name, void (*valfunc)(infotile*,char*),char* val, uint8_t row, uint8_t col, uint16_t xsize=190,uint16_t ysize=100){
+  static int32_t col_dsc[] = {xsize, LV_GRID_TEMPLATE_LAST};
+  static int32_t row_dsc[] = {16, ysize-16, LV_GRID_TEMPLATE_LAST};
+
+  lv_obj_t * cont = lv_obj_create(parent);
+  lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
+  lv_obj_t * label = lv_label_create(cont);
+  lv_obj_set_style_pad_all(label,5,0);
+  
+  lv_label_set_text(label, name);
+
+  lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
+  lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
+  lv_obj_set_style_pad_all(cont,0,0);
+  lv_obj_set_style_border_width(cont,2,0);
+  lv_obj_set_style_border_color(cont,lv_color_hex(0xffffff),0);
+
+  lv_obj_set_style_radius(cont,0,0);
+  lv_obj_set_layout(cont, LV_LAYOUT_GRID);
+  lv_obj_set_grid_cell(label, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
+  
+
+  lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
+
+it->cont=cont; 
+  valfunc(it,val);
+
+
+    
+}
+
+
+void simpleTileValueLabel(infotile* it, char* v){
+  it->value = lv_label_create(it->cont);
+  lv_label_set_text(it->value , v); 
+    lv_obj_set_style_text_font(it->value , &brandon_BI_50,0);
+    lv_obj_set_grid_cell(it->value , LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
+
+}
+
+
 void drawInfoGrid(){
     static int32_t col_dsc[] = {200, LV_GRID_TEMPLATE_LAST};
     static int32_t row_dsc[] = {120, 120, 120, LV_GRID_TEMPLATE_LAST};
@@ -437,11 +484,12 @@ void drawInfoGrid(){
     lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
     
 
-    obj = drawInfoTile(cont, "Akkustand",1,0);
-    value = lv_label_create(obj);
-    lv_label_set_text(value, "69p"); 
-    lv_obj_set_style_text_font(value, &brandon_BI_50,0);
-    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
+
+   infotile akku;
+
+
+    drawInfoTile2(cont,&akku, "Akkustand",simpleTileValueLabel,"68p",1,0);
+    
    
 
     obj = drawInfoTile(cont, "Gesamtkilometer",2,0);  
@@ -569,7 +617,7 @@ void createSettingsTab(){
   }
   //lv_obj_set_style_pad_all(value,2,0);
   //lv_obj_set_style_text_font(value, &brandon_BI_50,0);
-  lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 1);
+  lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
   lv_obj_add_event_cb(value, sw_avas_evh, LV_EVENT_ALL, NULL);
   
 
