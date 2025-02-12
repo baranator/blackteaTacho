@@ -455,8 +455,6 @@ void drawInfoGrid(){
     static int32_t col_dsc[] = {200, LV_GRID_TEMPLATE_LAST};
     static int32_t row_dsc[] = {120, 120, 120, LV_GRID_TEMPLATE_LAST};
   
-    
-
      /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(tachoTab);
     lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), LV_PART_MAIN);
@@ -471,32 +469,12 @@ void drawInfoGrid(){
     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
     lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
 
-    lv_obj_t * obj;
-  lv_obj_t * value;
+    infotile akku,odo,range;
 
-    
-    
-    obj = drawInfoTile(cont, "Restreichweite",0,0);
-    value = lv_label_create(obj);
-    lv_label_set_text(value, "42km");
-    lv_obj_set_style_pad_all(value,2,0);
-    lv_obj_set_style_text_font(value, &brandon_BI_50,0);
-    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
-    
-
-
-   infotile akku;
-
-
-    drawInfoTile2(cont,&akku, "Akkustand",simpleTileValueLabel,"68p",1,0);
-    
-   
-
-    obj = drawInfoTile(cont, "Gesamtkilometer",2,0);  
-    value = lv_label_create(obj);
-    lv_label_set_text(value, "1337km");
-    lv_obj_set_style_text_font(value, &brandon_BI_50,0);
-    lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
+    drawInfoTile2(cont,&range, "Restreichweite", simpleTileValueLabel, "42km", 0, 0);
+    drawInfoTile2(cont,&akku, "Akkustand", simpleTileValueLabel, "68p", 1, 0);
+    drawInfoTile2(cont,&odo, "Gesamtkilometer", simpleTileValueLabel, "137km", 2, 0);
+  
 
 
 
