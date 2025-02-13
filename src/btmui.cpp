@@ -410,70 +410,87 @@ struct infotile{
   lv_obj_t * value;
 };
 
-void drawInfoTile2(lv_obj_t * parent,infotile* it, const char* name, void (*valfunc)(infotile*,char*),char* val, uint8_t row, uint8_t col, uint16_t xsize=190,uint16_t ysize=100){
-  static int32_t col_dsc[] = {xsize, LV_GRID_TEMPLATE_LAST};
-  static int32_t row_dsc[] = {16, ysize-16, LV_GRID_TEMPLATE_LAST};
-
+void drawInfoTile2(lv_obj_t * parent,infotile* it, const char* name, void (*valfunc)(infotile*,char*),char* val, uint16_t xsize=lv_pct(100),uint16_t ysize=100){
   lv_obj_t * cont = lv_obj_create(parent);
   lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
   lv_obj_t * label = lv_label_create(cont);
-  lv_obj_set_style_pad_all(label,5,0);
+  lv_obj_set_size(label,lv_pct(100), 15);
+  lv_obj_set_style_pad_all(label,0,0);
   
   lv_label_set_text(label, name);
 
-  lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
-  lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
-  lv_obj_set_style_pad_all(cont,0,0);
+  lv_obj_set_style_pad_all(cont,5,0);
   lv_obj_set_style_border_width(cont,2,0);
   lv_obj_set_style_border_color(cont,lv_color_hex(0xffffff),0);
 
   lv_obj_set_style_radius(cont,0,0);
-  lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-  lv_obj_set_grid_cell(label, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
-  
+  lv_obj_set_size(cont, xsize, ysize);
 
-  lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
+  lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
 
-it->cont=cont; 
-  valfunc(it,val);
-
-
-    
+  it->cont=cont; 
+  valfunc(it,val);  
 }
 
+void drawSettingsTile2(lv_obj_t * parent,infotile* it, const char* name, void (*valfunc)(infotile*,char*),char* val, uint16_t xsize=lv_pct(100),uint16_t ysize=100){
+  lv_obj_t * cont = lv_obj_create(parent);
+  lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
+  lv_obj_t * label = lv_label_create(cont);
+  //lv_obj_set_size(label,lv_pct(100), 15);
+  lv_obj_set_style_pad_all(label,0,0);
+  
+  lv_label_set_text(label, name);
+
+  lv_obj_set_style_pad_all(cont,5,0);
+  lv_obj_set_style_border_width(cont,2,0);
+  lv_obj_set_style_border_color(cont,lv_color_hex(0xffffff),0);
+
+  lv_obj_set_style_radius(cont,0,0);
+  lv_obj_set_size(cont, xsize, ysize);
+
+  lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+  lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN,LV_FLEX_ALIGN_CENTER,LV_FLEX_ALIGN_CENTER);
+  it->cont=cont; 
+  valfunc(it,val);  
+}
+
+void simpleTileValueSwitch(infotile* it, char* v){
+  it->value = lv_switch_create(it->cont);
+}
 
 void simpleTileValueLabel(infotile* it, char* v){
   it->value = lv_label_create(it->cont);
   lv_label_set_text(it->value , v); 
     lv_obj_set_style_text_font(it->value , &brandon_BI_50,0);
-    lv_obj_set_grid_cell(it->value , LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
+  //  lv_obj_set_grid_cell(it->value , LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
 
 }
 
 
-void drawInfoGrid(){
-    static int32_t col_dsc[] = {200, LV_GRID_TEMPLATE_LAST};
-    static int32_t row_dsc[] = {120, 120, 120, LV_GRID_TEMPLATE_LAST};
-  
-     /*Create a container with grid*/
+void drawInfoGrid(int width=210){
     lv_obj_t * cont = lv_obj_create(tachoTab);
-    lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), LV_PART_MAIN);
 
     lv_obj_add_style(cont, &tileGridStyle, 0);
 
-    lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
-    lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
-    lv_obj_set_size(cont, 210, 400);
+    lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_START);
+    lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    lv_obj_set_size(cont, width, 400);
     lv_obj_align(cont , LV_ALIGN_TOP_RIGHT, 0, 40);
-    //lv_obj_center(cont);
-    lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-    lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
 
-    infotile akku,odo,range;
+    infotile akku,odo,odo2,odo3,range;
 
-    drawInfoTile2(cont,&range, "Restreichweite", simpleTileValueLabel, "42km", 0, 0);
-    drawInfoTile2(cont,&akku, "Akkustand", simpleTileValueLabel, "68p", 1, 0);
-    drawInfoTile2(cont,&odo, "Gesamtkilometer", simpleTileValueLabel, "137km", 2, 0);
+    drawInfoTile2(cont,&range, "Restreichweite", simpleTileValueLabel, "42km", width-0);
+    drawInfoTile2(cont,&akku, "Akkustand", simpleTileValueLabel, "68p",width-0);
+    drawInfoTile2(cont,&odo, "Gesamtkilometer", simpleTileValueLabel, "137km", width-0);
+    drawInfoTile2(cont,&odo2, "Gesamtkilometer", simpleTileValueLabel, "138km", width-0);
+    drawInfoTile2(cont,&odo3, "Gesamtkilometer", simpleTileValueLabel, "139km", width-0);
+
+
+    //prevent overscrolling at the bottom
+    lv_obj_remove_flag(odo2.cont, LV_OBJ_FLAG_SNAPPABLE);
+     lv_obj_remove_flag(odo3.cont, LV_OBJ_FLAG_SNAPPABLE);
   
 
 
@@ -525,7 +542,14 @@ void drawWarningLights(){
 
 }
 
-
+void drawBTMLogo(){
+  LV_IMAGE_DECLARE(Black_50);
+  lv_obj_t * img1 = lv_image_create(tachoTab);
+  lv_obj_set_style_img_recolor(img1, lv_color_hex(0xffffff),0);
+  lv_obj_set_style_img_recolor_opa(img1,LV_OPA_COVER ,0);
+  lv_image_set_src(img1, &Black_50);
+  lv_obj_align(img1 , LV_ALIGN_BOTTOM_LEFT,200,-10);
+}
 
 void createTachoTab(){
    //fahrstufe???, blinker
@@ -539,6 +563,7 @@ void createTachoTab(){
    
    drawInfoGrid();
    drawWarningLights();
+   drawBTMLogo();
 }
 
 static void sw_avas_evh(lv_event_t * e)
@@ -565,39 +590,31 @@ void createSettingsTab(){
   lv_label_set_text(heading, "Einstellungen");
   lv_obj_set_style_text_font(heading, &lv_font_montserrat_18,0);
 
-  //Tiles for settings
-  static int32_t col_dsc[] = {360,360, LV_GRID_TEMPLATE_LAST};
-  static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST};
-  static lv_style_t gridStyle;
-  lv_style_init(&gridStyle);
-
    /*Create a container with grid*/
   lv_obj_t * cont = lv_obj_create(settingsTab);
-  lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
-  lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
 
-  lv_obj_set_size(cont, 750, 360);
+  lv_obj_set_size(cont, lv_pct(100), 360);
+  lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
   lv_obj_align(cont , LV_ALIGN_TOP_LEFT, 0, 50);
-  //lv_obj_center(cont);
-  lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-  lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
+
   lv_obj_add_style(cont, &tileGridStyle, 0);
 
+  infotile avason,themesel,retardunits;
+
   //AVAS ON/OFF
-  lv_obj_t *obj = drawInfoTile(cont, "AVAS",0,0,300,80);
-  lv_obj_t *value = lv_switch_create(obj);
+  drawSettingsTile2(cont,&avason, "AVAS an", simpleTileValueSwitch, "", 600);
+  lv_obj_add_event_cb(avason.value, sw_avas_evh, LV_EVENT_ALL, NULL);
+
   if(getPrefs()->getBool("avasEnabled")){
-    lv_obj_add_state(value, LV_STATE_CHECKED);
+    lv_obj_add_state(avason.value, LV_STATE_CHECKED);
     soundEnable();
   }else{
-    lv_obj_remove_state(value, LV_STATE_CHECKED);
+    lv_obj_remove_state(avason.value, LV_STATE_CHECKED);
     soundDisable();
   }
-  //lv_obj_set_style_pad_all(value,2,0);
-  //lv_obj_set_style_text_font(value, &brandon_BI_50,0);
-  lv_obj_set_grid_cell(value, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
-  lv_obj_add_event_cb(value, sw_avas_evh, LV_EVENT_ALL, NULL);
   
+  
+  drawSettingsTile2(cont,&retardunits, "Imperiale Einheiten", simpleTileValueSwitch, "", 600);
 
 
 
@@ -613,10 +630,10 @@ void drawClock(){
 
 void initTileGridStyle(){
   lv_style_init(&tileGridStyle);
-  lv_style_set_pad_column(&tileGridStyle,1);
+ // lv_style_set_pad_column(&tileGridStyle,1);
   lv_style_set_border_width(&tileGridStyle,0);
-  lv_style_set_pad_row(&tileGridStyle,1);
-  lv_style_set_pad_all(&tileGridStyle,1);
+//  lv_style_set_pad_row(&tileGridStyle,1);
+  lv_style_set_pad_all(&tileGridStyle,0);
   lv_style_set_radius(&tileGridStyle,0);
   lv_style_set_bg_color(&tileGridStyle, lv_color_hex(0x000000));
 
@@ -628,7 +645,7 @@ void showMainScreen(lv_display_t * display){
                                         lv_color_hex(0xdddddd),
                                         true,                   /* Dark theme?  False = light theme. */
                                         &lv_font_montserrat_14);
-    lv_display_set_theme(display, th); /* Assign theme to display */
+  lv_display_set_theme(display, th); /* Assign theme to display */
 
 
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x000000), LV_PART_MAIN);
