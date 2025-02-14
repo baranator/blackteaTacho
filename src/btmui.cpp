@@ -16,10 +16,16 @@ LV_FONT_DECLARE(brandon_BI_150);
 LV_FONT_DECLARE(googleMat40);
 //LV_FONT_DECLARE(lv_font_montserrat_10);
 
+
+LV_IMAGE_DECLARE(warn_charge);
+LV_IMAGE_DECLARE(warn_engine);
+LV_IMAGE_DECLARE(warn_light);
+LV_IMAGE_DECLARE(warn_temp);
+
 lv_theme_t * th;
 
 static lv_style_t t_speed_style;
-    static lv_style_t t_unit_style;
+static lv_style_t t_unit_style;
 static lv_style_t pm_bg_style;
 static lv_style_t tileGridStyle;
 //static lv_style_t pm_ind_style;
@@ -40,7 +46,13 @@ lv_obj_t* warnLight;
 lv_obj_t* warnBattery;
 lv_obj_t* warnTemp;
 
-void setSpeed(uint8_t val){
+void setSpeedKmh(uint8_t val){
+
+  if(getPrefs()->getBool("retardUnits")){
+    //do conversion km/h->mph
+    val=val
+  }
+
       lv_arc_set_value(arc, val);
       char str[5];
       sprintf(str, "%d", val);
@@ -48,8 +60,9 @@ void setSpeed(uint8_t val){
 }
 
 void setLight(bool on){
-  lv_obj_set_style_text_color(warnLight, lv_color_hex(on?0x0000ff:0x222222),LV_PART_MAIN);
+  lv_obj_set_style_img_recolor(warnLight, lv_color_hex(on?0x0000ff:0x222222),LV_PART_MAIN);
 }
+
 
 void setPower(int16_t val){
   
@@ -366,43 +379,43 @@ void drawTabView(void){
     lv_obj_remove_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLLABLE);
 }
 
-lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_t col, uint16_t xsize=190,uint16_t ysize=100){
-    static int32_t col_dsc[] = {xsize, LV_GRID_TEMPLATE_LAST};
-    static int32_t row_dsc[] = {16, ysize-16, LV_GRID_TEMPLATE_LAST};
-    //static lv_style_t tileStyle;
+// lv_obj_t * drawInfoTile(lv_obj_t * parent, const char* name, uint8_t row, uint8_t col, uint16_t xsize=190,uint16_t ysize=100){
+//     static int32_t col_dsc[] = {xsize, LV_GRID_TEMPLATE_LAST};
+//     static int32_t row_dsc[] = {16, ysize-16, LV_GRID_TEMPLATE_LAST};
+//     //static lv_style_t tileStyle;
 
 
 
 
-    lv_obj_t * cont = lv_obj_create(parent);
-    lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
-    lv_obj_t * label = lv_label_create(cont);
-    lv_obj_set_style_pad_all(label,5,0);
+//     lv_obj_t * cont = lv_obj_create(parent);
+//     lv_obj_set_style_bg_color(cont, lv_color_hex(0x000000), 0);
+//     lv_obj_t * label = lv_label_create(cont);
+//     lv_obj_set_style_pad_all(label,5,0);
     
-    lv_label_set_text(label, name);
+//     lv_label_set_text(label, name);
 
-    lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
-    lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
-    lv_obj_set_style_pad_all(cont,0,0);
-    lv_obj_set_style_border_width(cont,2,0);
-    lv_obj_set_style_border_color(cont,lv_color_hex(0xffffff),0);
-    //lv_obj_set_style_pad_hor(cont,0,0);
+//     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
+//     lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
+//     lv_obj_set_style_pad_all(cont,0,0);
+//     lv_obj_set_style_border_width(cont,2,0);
+//     lv_obj_set_style_border_color(cont,lv_color_hex(0xffffff),0);
+//     //lv_obj_set_style_pad_hor(cont,0,0);
 
-    lv_obj_set_style_radius(cont,0,0);
-    //lv_obj_add_style(cont, &tileStyle, 0);
+//     lv_obj_set_style_radius(cont,0,0);
+//     //lv_obj_add_style(cont, &tileStyle, 0);
 
-    //lv_obj_set_size(cont, 200, 120);
-    //lv_obj_align(cont, LV_ALIGN_CENTER, 0, 0);
-    //lv_obj_center(cont);
-    lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-    // lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
-    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
+//     //lv_obj_set_size(cont, 200, 120);
+//     //lv_obj_align(cont, LV_ALIGN_CENTER, 0, 0);
+//     //lv_obj_center(cont);
+//     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
+//     // lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_EVENLY, LV_GRID_ALIGN_SPACE_EVENLY);
+//     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
     
 
-    lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
+//     lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
 
-    return cont;
-}
+//     return cont;
+// }
 
 struct infotile{
   lv_obj_t * cont;
@@ -490,57 +503,112 @@ void drawInfoGrid(int width=210){
 
     //prevent overscrolling at the bottom
     lv_obj_remove_flag(odo2.cont, LV_OBJ_FLAG_SNAPPABLE);
-     lv_obj_remove_flag(odo3.cont, LV_OBJ_FLAG_SNAPPABLE);
+    lv_obj_remove_flag(odo3.cont, LV_OBJ_FLAG_SNAPPABLE);
   
 
 
 
 }
 
-lv_obj_t * initWarnLight(  lv_obj_t * parent, const char* symbol,int32_t posx, int32_t posy){
-  lv_obj_t * lbl= lv_label_create(parent);
-  lv_label_set_text(lbl, symbol);
+// lv_obj_t * initWarnLight(  lv_obj_t * parent, const char* symbol,int32_t posx, int32_t posy){
+//   lv_obj_t * lbl= lv_label_create(parent);
+//   lv_label_set_text(lbl, symbol);
 
-  static lv_style_t warnStyle;
-  lv_style_init(&warnStyle);
-  lv_style_set_bg_opa(&warnStyle, LV_OPA_0);
-  lv_style_set_pad_all(&warnStyle, 2);
-  lv_style_set_text_font(&warnStyle, &lv_font_montserrat_40);
-  lv_style_set_text_color(&warnStyle, lv_color_hex(0x222222));
-  lv_obj_add_style(lbl, &warnStyle, LV_PART_MAIN);
+//   static lv_style_t warnStyle;
+//   lv_style_init(&warnStyle);
+//   lv_style_set_bg_opa(&warnStyle, LV_OPA_0);
+//   lv_style_set_pad_all(&warnStyle, 2);
+//   lv_style_set_text_font(&warnStyle, &lv_font_montserrat_40);
+//   lv_style_set_text_color(&warnStyle, lv_color_hex(0x222222));
+//   lv_obj_add_style(lbl, &warnStyle, LV_PART_MAIN);
   
 
-  lv_obj_set_grid_cell(lbl, LV_GRID_ALIGN_STRETCH, posx, 1, LV_GRID_ALIGN_STRETCH, posy, 1);
-  return lbl;
+//   lv_obj_set_grid_cell(lbl, LV_GRID_ALIGN_STRETCH, posx, 1, LV_GRID_ALIGN_STRETCH, posy, 1);
+//   return lbl;
+// }
+
+
+
+
+lv_obj_t * initWarnLight2(  lv_obj_t * parent, const char symbol){
+  //lv_obj_t * lbl= lv_label_create(parent);
+  //lv_label_set_text(lbl, symbol);
+
+  //static lv_style_t warnStyle;
+  //lv_style_init(&warnStyle);
+  //lv_style_set_bg_opa(&warnStyle, LV_OPA_0);
+  //lv_style_set_pad_all(&warnStyle, 2);
+  //lv_style_set_text_font(&warnStyle, &lv_font_montserrat_40);
+  //lv_style_set_text_color(&warnStyle, lv_color_hex(0x222222));
+  //lv_obj_add_style(lbl, &warnStyle, LV_PART_MAIN);
+  
+  lv_obj_t * img1 = lv_image_create(parent);
+  lv_obj_set_style_img_recolor(img1, lv_color_hex(0x222222),0);
+  lv_obj_set_style_img_recolor_opa(img1,LV_OPA_COVER ,0);
+  switch(symbol){
+    case 'b': lv_image_set_src(img1, &warn_charge);break;
+    case 'e': lv_image_set_src(img1, &warn_engine);break;
+    case 'l': lv_image_set_src(img1, &warn_light);break;
+    case 't': lv_image_set_src(img1, &warn_temp);break;
+
+  }
+  
+  return img1;
 }
 
-void drawWarningLights(){
-    static int32_t col_dsc[] = {50,50,50,50, LV_GRID_TEMPLATE_LAST};
-    static int32_t row_dsc[] = {50, LV_GRID_TEMPLATE_LAST};
+void drawWarningLights2(){
 
+  /*Create a container with grid*/
+  lv_obj_t * cont = lv_obj_create(tachoTab);
 
+  lv_obj_set_style_bg_opa(cont, LV_OPA_0, LV_PART_MAIN);
+  lv_obj_set_style_border_width(cont, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_all(cont, 0, LV_PART_MAIN);
 
-     /*Create a container with grid*/
-    lv_obj_t * cont = lv_obj_create(tachoTab);
+  lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+  lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+  lv_obj_set_size(cont, 220, 60);
+  lv_obj_align(cont , LV_ALIGN_BOTTOM_LEFT, 195, -75);
 
-    lv_obj_set_style_bg_opa(cont, LV_OPA_0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(cont, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(cont, 0, LV_PART_MAIN);
-    lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
-    lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
-    lv_obj_set_size(cont, 240, 70);
-    //lv_obj_center(cont);
-    lv_obj_set_layout(cont, LV_LAYOUT_GRID);
-    lv_obj_align(cont , LV_ALIGN_BOTTOM_LEFT, 185, -60);
-
-
-
-    warnEngine = initWarnLight(cont,LV_SYMBOL_WARNING,3,0);
-    warnLight= initWarnLight(cont,LV_SYMBOL_EYE_OPEN,0,0);
-    warnBattery = initWarnLight(cont,LV_SYMBOL_BATTERY_1,1,0);
-    warnTemp = initWarnLight(cont,LV_SYMBOL_UP,2,0);
+  warnBattery = initWarnLight2(cont,'b');
+  warnLight= initWarnLight2(cont,'l');
+  warnTemp = initWarnLight2(cont,'t');
+  warnEngine = initWarnLight2(cont,'e');
 
 }
+
+
+
+
+
+
+// void drawWarningLights(){
+//   static int32_t col_dsc[] = {50,50,50,50, LV_GRID_TEMPLATE_LAST};
+//   static int32_t row_dsc[] = {50, LV_GRID_TEMPLATE_LAST};
+
+
+
+//      /*Create a container with grid*/
+//     lv_obj_t * cont = lv_obj_create(tachoTab);
+
+//     lv_obj_set_style_bg_opa(cont, LV_OPA_0, LV_PART_MAIN);
+//     lv_obj_set_style_border_width(cont, 0, LV_PART_MAIN);
+//     lv_obj_set_style_pad_all(cont, 0, LV_PART_MAIN);
+//     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
+//     lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
+//     lv_obj_set_size(cont, 240, 70);
+//     //lv_obj_center(cont);
+//     lv_obj_set_layout(cont, LV_LAYOUT_GRID);
+//     lv_obj_align(cont , LV_ALIGN_BOTTOM_LEFT, 185, -60);
+
+
+
+//     warnEngine = initWarnLight(cont,LV_SYMBOL_WARNING,3,0);
+//     warnLight= initWarnLight2(cont,'l');
+//     warnBattery = initWarnLight2(cont,'b');
+//     warnTemp = initWarnLight(cont,LV_SYMBOL_UP,2,0);
+
+// }
 
 void drawBTMLogo(){
   LV_IMAGE_DECLARE(Black_50);
@@ -562,7 +630,7 @@ void createTachoTab(){
    
    
    drawInfoGrid();
-   drawWarningLights();
+   drawWarningLights2();
    drawBTMLogo();
 }
 
